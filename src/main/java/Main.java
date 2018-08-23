@@ -33,12 +33,7 @@ public class Main extends ListenerAdapter {
                 "Sender: " + event.getAuthor().getName() +
                 ", \"" + event.getMessage().getContentDisplay() + "\"");
 
-
-        if(event.getMessage().getAuthor().getName().equals("Ventrii")&&event.getMessage().getContentRaw().equals("!pingoff"))
-        {
-            event.getChannel().sendMessage("Tristan BÆ :heart:").queue();
-        }
-        else if(event.getMessage().getContentRaw().equals("!Rping")){
+        if(event.getMessage().getContentRaw().equals("!Rping")){
             event.getChannel().sendMessage("Pong , I'm awake!").queue();
         }
 
