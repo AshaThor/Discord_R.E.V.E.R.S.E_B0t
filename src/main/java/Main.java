@@ -10,7 +10,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Main extends ListenerAdapter {
+public class Main extends ListenerAdapter{
+    Logging logger = new Logging();
+    Giphy gif = new Giphy();
     public static void main(String[] args) throws LoginException, IOException {
         //New instance of JDABuilder (Wrapper for Discord)
         JDABuilder builder = new JDABuilder(AccountType.BOT);
@@ -21,32 +23,45 @@ public class Main extends ListenerAdapter {
         //Reads file to obtain token
         String token = tokenReader.readLine();
         builder.setToken(token);
+
+
         builder.addEventListener(new Main());
         builder.buildAsync();
+
     }
     /*
     * HAVE NOT FINSIHED COMMENTING BUT YOU CAN PROBS GET THE IDEA
     * */
     @Override
     public void onMessageReceived (MessageReceivedEvent event){
-        System.out.println("## Message recieved ## " +
-                "Sender: " + event.getAuthor().getName() +
-                ", \"" + event.getMessage().getContentDisplay() + "\"");
-
-        if(event.getMessage().getContentRaw().equals("!Rping")){
-            event.getChannel().sendMessage("Pong , I'm awake!").queue();
+        if (logger.getLoggingStatus()){
+            logger.consoleLogging(event);
         }
-
         if(event.getMessage().getContentRaw().contains("!reverse")){
-            String plainText = event.getMessage().getContentRaw();
+            Reverse reverse = new Reverse();
+            event.getChannel().sendMessage("The Reverse of your text is : " +
+                    reverse.getReverse(event.getMessage().getContentDisplay())).queue();
+        }
+        if(event.getMessage().getContentRaw().contains("!startLogging")) {
+            logger.setStatus(true);
+            System.out.println("This should work " + logger.getLoggingStatus());
+        }
+        else if (event.getMessage().getContentRaw().contains("!stop" + "Logging")) {
+            logger.setStatus(false);
+        }
+        if(event.getMessage().getContentRaw().contains("!gif")) {
+            String plainText = event.getMessage().getContentDisplay();
             plainText = plainText.toLowerCase();
-            String targetText = plainText.replace("!reverse ","");
-            String reverseText = "";
-            for(int i = targetText.length() -1 ; i >= 0; i--) {
-                reverseText = reverseText + targetText.charAt(i);
+            String targetText = plainText.replace("!gif ","");
+            System.out.println(targetText);
+            try{
+                event.getChannel().sendMessage("Here is your gif " +
+                        gif.getGif(targetText)).queue();
             }
-                event.getChannel().sendMessage("The reverse of your text is: " + reverseText).queue();
-
+            catch(IOException e) {
+                event.getChannel().sendMessage("Sorry that is not avalible").queue();
+                throw new RuntimeException(e.getMessage());
+            }
         }
     }
 }
